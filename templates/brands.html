@@ -1,0 +1,16 @@
+<html>
+<head>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class = 'top'>
+<h1>Brands</h1>
+  <a href="{{url_for('newBrand')}}" > <h3> Create a New Brand </h3> </a>
+{% for brand in brands %}
+    <a href = "{{url_for('showProduct', brand_id = brand.id)}}"> <p>{{brand.name}}</p></a>
+    <p><a href = "{{url_for('editBrand', brand_id = brand.id)}}">Edit Brand</a></p>
+    <p> <a href = "{{url_for('deleteBrand',brand_id = brand.id)}}">Delete Brand</a> </p>
+{% endfor %}
+</div>
+</body>
+</html>

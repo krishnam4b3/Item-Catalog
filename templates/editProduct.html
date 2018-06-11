@@ -1,0 +1,43 @@
+<html>
+<head>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body><h1> Edit Product </h1>
+<form action="#" method = 'post'>
+	<p>Name:</p>
+		<input type ='text' size='30' name='name' placeholder = '{{details.name }}'>
+	<p>Description:</p>
+		<input type ='text' size='30' name='description' placeholder = '{{details.description}}'>
+	<p>Price:</p>
+		<input type ='text' size='30' name='price' placeholder = '{{details.price}}'>
+	<p>Costumetype:<p>
+	{% if details.costumetype == 'Bottomwear' %}
+		<dd><input type ='radio' name='costumetype' value='Jeans'checked >Bottomwear</dd>
+	{%else%}
+	<dd><input type ='radio' name='costumetype' value='Jeans' >Bottomwear</dd>
+    {% endif %}
+    {% if details.costumetype == 'Shirts' %}
+       <dd><input type ='radio' name='costumetype' value='Shirts' checked>Shirts</dd>
+    {%else%}
+		<dd><input type ='radio' name='costumetype' value='Shirts'>Shirts</dd>
+    {% endif %}
+	{% if details.costumetype == 'T-Shirts'%}
+		<dd><input type ='radio' name='costumetype' value='T-Shirts'checked >T-Shirts</dd>
+	{% else %}
+	   <dd><input type ='radio' name='costumetype' value='T-Shirts'>T-Shirts</dd>
+	{% endif %}
+
+
+	
+
+
+
+<input type='submit' value='Edit'>
+
+
+<a href = '#'> Cancel </a>
+
+
+</form>
+</body>
+</html>
