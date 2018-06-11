@@ -14,7 +14,6 @@ How to Run?
 Python
 HTML
 CSS
-Bootstrap
 Flask
 Jinja2
 SQLAchemy
