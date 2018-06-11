@@ -14,8 +14,8 @@ from flask import make_response
 import requests
 # import login decorator
 from functools import wraps
-from flask import Flask, render_template,
-request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template
+from flask import request, redirect, jsonify, url_for, flash
 app = Flask(__name__)
 
 CLIENT_ID = json.loads(open('client_secrets.json',
@@ -64,7 +64,7 @@ def gconnect():
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        response = make_response(json.dumps('Failedto upgrade\n
+        response = make_response(json.dumps('Failed to upgrade\
                                             the authorization code'), 401)
         response.headers['Content-Type'] = 'application-json'
         return response
@@ -100,7 +100,7 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user\n
+        response = make_response(json.dumps('Current user\
                                             is already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
@@ -184,8 +184,8 @@ def gdisconnect():
         response = make_response(json.dumps('Current user not connected'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s'%
-    login_session['access_token']
+    url = 'https://accounts.google.c\
+           om/o/oauth2/revoke?token=%s'% login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print('result is')
