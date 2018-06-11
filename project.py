@@ -74,7 +74,7 @@ def gconnect():
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
     h = httplib2.Http()
-    result = json.loads(h.request(url, 'POST')[1].decode("utf-8"))
+    result = json.loads(h.request(url, 'GET')[1].decode("utf-8"))
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
@@ -185,7 +185,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     url = 'https://accounts.google.c\
-           om/o/oauth2/revoke?token=%s'% login_session['access_token']
+           om/o/oauth2/revoke?token = %s' % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print('result is')
@@ -225,7 +225,7 @@ def brandProductJSON(brand_id):
     brand = session.query(Brand).filter_by(id=brand_id).one()
     details = session.query(Product).filter_by(
         brand_id=brand_id).all()
-    return jsonify(Product=[i.serialize for i in items])
+    return jsonify(Product=[i.serialize for i in details])
 
 
 @app.route('/brand/<int:brand_id>/details/<int:details_id>/JSON')
@@ -255,6 +255,8 @@ def showBrands():
 @app.route('/brand/new/', methods=['GET', 'POST'])
 def newBrand():
     session2 = DBSession()
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
         newBrand = Brand(name=request.form['name'])
         session2.add(newBrand)
@@ -272,19 +274,27 @@ def newBrand():
 @app.route('/brand/<int:brand_id>/edit/', methods=['GET', 'POST'])
 def editBrand(brand_id):
     session3 = DBSession()
-    editedBrand = session3.query(Brand).filter_by(id=brand_id).one()
+    editBrand = session3.query(Brand).filter_by(id=brand_id).one()
+    if 'username' not in login_session:
+        return redirect('/login')
+        if editBrand.user_id != login_session['user_id']:
+            if editBrand.user_id != login_session['user_id']:
+                return "<script>function myFunction() {alert('You \
+            are not authorized to edit this Brand.\
+            Please create your own entry in order \
+            to edit/delete.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
-            print(editedBrand.name)
-            editedBrand.name = request.form['name']
-            session3.add(editedBrand)
+            print(editBrand.name)
+            editBrand.name = request.form['name']
+            session3.add(editBrand)
             session3.commit()
             session3.close()
             return redirect(url_for('showBrands'))
     else:
         session3.close()
         return render_template(
-            'editBrand.html', brand=editedBrand)
+            'editBrand.html', brand=editBrand)
 
     # return 'This page will be for editing brand %s' % brand_id
 
@@ -294,10 +304,18 @@ def editBrand(brand_id):
 @app.route('/brand/<int:brand_id>/delete/', methods=['GET', 'POST'])
 def deleteBrand(brand_id):
     session4 = DBSession()
-    brandToDelete = session4.query(
+    deleteBrand = session4.query(
         Brand).filter_by(id=brand_id).one()
+    if 'username' not in login_session:
+        return redirect('/login')
+        if deleteBrand.user_id != login_session['user_id']:
+            if deleteBrand.user_id != login_session['user_id']:
+                return "<script>function myFunction() {alert('You \
+                are not authorized to delete this Brand.\
+                Please create your own entry in order \
+                to edit/delete.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
-        session4.delete(brandToDelete)
+        session4.delete(deleteBrand)
         session4.commit()
         session4.close()
         return redirect(
@@ -305,7 +323,7 @@ def deleteBrand(brand_id):
     else:
         session4.close()
         return render_template(
-            'deleteBrand.html', brand=brandToDelete)
+            'deleteBrand.html', brand=deleteBrand)
     # return 'This page will be for deleting brand %s' % brand_id
 
 
@@ -329,13 +347,22 @@ def showProduct(brand_id):
     '/brand/<int:brand_id>/product/new/', methods=['GET', 'POST'])
 def newProduct(brand_id):
     session6 = DBSession()
+    if 'username' not in login_session:
+        return redirect('/login')
+    brand = session6.query(Brand).filter_by(id=brand_id).one()
+    if login_session['user_id'] != brand.user_id:
+        if deleteBrand.user_id != login_session['user_id']:
+            return "<script>function myFunction() {alert('You \
+            are not authorized to delete this Brand.\
+            Please create your own entry in order \
+            to edit/delete.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
-        newDetails = Product(name=request.form['name'],
+        newProduct = Product(name=request.form['name'],
                              description=request.form[
                              'description'], price=request.form['price'],
                              costumetype=request.form['costumetype'],
                              brand_id=brand_id)
-        session6.add(newItem)
+        session6.add(newProduct)
         session6.commit()
         session6.close()
 
@@ -355,17 +382,26 @@ def newProduct(brand_id):
            methods=['GET', 'POST'])
 def editProduct(brand_id, product_id):
     session7 = DBSession()
-    editedProduct = session7.query(Product).filter_by(id=product_id).one()
+    if 'username' not in login_session:
+        return redirect('/login')
+    editProduct = session7.query(Product).filter_by(id=product_id).one()
+    brand = session7.query(Brand).filter_by(id=brand_id).one()
+    if login_session['user_id'] != brand.user_id:
+        if deleteBrand.user_id != login_session['user_id']:
+            return "<script>function myFunction() {alert('You \
+            are not authorized to edit this Brand.\
+            Please create your own entry in order \
+            to edit/delete.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
-            editedProduct.name = request.form['name']
+            editProduct.name = request.form['name']
         if request.form['description']:
-            editedProduct.description = request.form['name']
+            editProduct.description = request.form['name']
         if request.form['price']:
-            editedProduct.price = request.form['price']
+            editProduct.price = request.form['price']
         if request.form['costumetype']:
-            editedProduct.costumetype = request.form['costumetype']
-        session7.add(editedProduct)
+            editProduct.costumetype = request.form['costumetype']
+        session7.add(editProduct)
         session7.commit()
         session7.close()
         return redirect(url_for('showProduct', brand_id=brand_id))
@@ -373,7 +409,7 @@ def editProduct(brand_id, product_id):
         session7.close()
 
         return render_template('editProduct.html', brand_id=brand_id,
-                               product_id=product_id, details=editedProduct)
+                               product_id=product_id, details=editProduct)
 
     # return 'This page is for editing product details %s' % product_id
 
@@ -384,15 +420,25 @@ def editProduct(brand_id, product_id):
            methods=['GET', 'POST'])
 def deleteProduct(brand_id, product_id):
     session8 = DBSession()
-    productToDelete = session8.query(Product).filter_by(id=product_id).one()
+    if 'username' not in login_session:
+        return redirect('/login')
+    editProduct = session8.query(Product).filter_by(id=product_id).one()
+    brand = session8.query(Brand).filter_by(id=brand_id).one()
+    deleteProduct = session8.query(Product).filter_by(id=product_id).one()
+    if login_session['user_id'] != brand.user_id:
+        if deleteBrand.user_id != login_session['user_id']:
+            return "<script>function myFunction() {alert('You \
+            are not authorized to delete this Brand.\
+            Please create your own entry in order \
+            to edit/delete.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
-        session8.delete(productToDelete)
+        session8.delete(deleteProduct)
         session8.commit()
         session8.close()
         return redirect(url_for('showProduct', brand_id=brand_id))
     else:
         session8.close()
-        return render_template('deleteProduct.html', details=productToDelete)
+        return render_template('deleteProduct.html', details=deleteProduct)
     # return "This page is for deleting product details %s" % product_id
 
 
