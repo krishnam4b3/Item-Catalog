@@ -4,11 +4,11 @@
 </head>
 <body>
 <h1>New Product</h1>
-<form action="#" method = 'post'>
+<form action="{{url_for('newProduct', brand_id=brand_id)}}" method = 'post'>
 	<p>Name:</p>
 		<input type ='text' size='30' name='name'>
 	<p>Description:</p>
-		<input type ='text' size='30' name='discount'>
+		<input type ='text' size='30' name='description'>
 	<p>Price:</p>
 		<input type ='text' size='30' name='price'>
 	<p>Costumetype:</p>
