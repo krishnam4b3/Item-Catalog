@@ -33,7 +33,7 @@ session = DBSession()
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_name' in login_session:
+        if 'username' in login_session:
             return redirect('/login')
         return f(*args, **kwargs)
     return decorated_function
@@ -258,7 +258,8 @@ def newBrand():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        newBrand = Brand(name=request.form['name'])
+        newBrand = Brand(name=request.form['name'],
+                         user_id=login_session['user_id'])
         session2.add(newBrand)
         session2.commit()
         session2.close()
@@ -277,8 +278,8 @@ def editBrand(brand_id):
     editBrand = session3.query(Brand).filter_by(id=brand_id).one()
     if 'username' not in login_session:
         return redirect('/login')
-        if editBrand.user_id != login_session['user_id']:
-            if editBrand.user_id != login_session['user_id']:
+        if editBrand.user_id == login_session['user_id']:
+            if brand.user_id != login_session['user_id']:
                 return "<script>function myFunction() {alert('You \
             are not authorized to edit this Brand.\
             Please create your own entry in order \
@@ -290,11 +291,11 @@ def editBrand(brand_id):
             session3.add(editBrand)
             session3.commit()
             session3.close()
-            return redirect(url_for('showBrands'))
+            return redirect(url_for('showBrands', brand_id=brand_id))
     else:
         session3.close()
         return render_template(
-            'editBrand.html', brand=editBrand)
+            'editBrand.html', brand_id=brand_id, brand=editBrand)
 
     # return 'This page will be for editing brand %s' % brand_id
 
@@ -308,7 +309,7 @@ def deleteBrand(brand_id):
         Brand).filter_by(id=brand_id).one()
     if 'username' not in login_session:
         return redirect('/login')
-        if deleteBrand.user_id != login_session['user_id']:
+        if deleteBrand.user_id == login_session['user_id']:
             if deleteBrand.user_id != login_session['user_id']:
                 return "<script>function myFunction() {alert('You \
                 are not authorized to delete this Brand.\
@@ -323,7 +324,7 @@ def deleteBrand(brand_id):
     else:
         session4.close()
         return render_template(
-            'deleteBrand.html', brand=deleteBrand)
+            'deleteBrand.html', brand_id=brand_id, brand=deleteBrand)
     # return 'This page will be for deleting brand %s' % brand_id
 
 
@@ -347,31 +348,24 @@ def showProduct(brand_id):
     '/brand/<int:brand_id>/product/new/', methods=['GET', 'POST'])
 def newProduct(brand_id):
     session6 = DBSession()
+    brand = session6.query(Brand).filter_by(id=brand_id).one()
     if 'username' not in login_session:
         return redirect('/login')
-    brand = session6.query(Brand).filter_by(id=brand_id).one()
-    if login_session['user_id'] != brand.user_id:
-        if deleteBrand.user_id != login_session['user_id']:
-            return "<script>function myFunction() {alert('You \
-            are not authorized to delete this Brand.\
-            Please create your own entry in order \
-            to edit/delete.');}</script><body onload='myFunction()'>"
     if request.method == 'POST':
-        newProduct = Product(name=request.form['name'],
-                             description=request.form[
-                             'description'], price=request.form['price'],
-                             costumetype=request.form['costumetype'],
-                             brand_id=brand_id)
-        session6.add(newProduct)
+        newBrand = Product(name=request.form['name'],
+                           description=request.form['description'],
+                           price=request.form['price'],
+                           costumetype=request.form['costumetype'],
+                           brand_id=brand.id,
+                           user_id=brand.user_id)
+        session6.add(newBrand)
         session6.commit()
         session6.close()
-
         return redirect(url_for('showProduct', brand_id=brand_id))
     else:
-        session6.close()
         return render_template('newProduct.html', brand_id=brand_id)
 
-    return render_template('newProduct.html', brand=brand)
+    return render_template('newProduct.html')
     # return 'This page is for making a new product details for brand %s'
     # %brand_id
 
@@ -386,8 +380,8 @@ def editProduct(brand_id, product_id):
         return redirect('/login')
     editProduct = session7.query(Product).filter_by(id=product_id).one()
     brand = session7.query(Brand).filter_by(id=brand_id).one()
-    if login_session['user_id'] != brand.user_id:
-        if deleteBrand.user_id != login_session['user_id']:
+    if login_session['user_id'] == brand.user_id:
+        if brand.user_id != login_session['user_id']:
             return "<script>function myFunction() {alert('You \
             are not authorized to edit this Brand.\
             Please create your own entry in order \
@@ -425,8 +419,8 @@ def deleteProduct(brand_id, product_id):
     editProduct = session8.query(Product).filter_by(id=product_id).one()
     brand = session8.query(Brand).filter_by(id=brand_id).one()
     deleteProduct = session8.query(Product).filter_by(id=product_id).one()
-    if login_session['user_id'] != brand.user_id:
-        if deleteBrand.user_id != login_session['user_id']:
+    if login_session['user_id'] == brand.user_id:
+        if brand.user_id != login_session['user_id']:
             return "<script>function myFunction() {alert('You \
             are not authorized to delete this Brand.\
             Please create your own entry in order \
@@ -438,7 +432,8 @@ def deleteProduct(brand_id, product_id):
         return redirect(url_for('showProduct', brand_id=brand_id))
     else:
         session8.close()
-        return render_template('deleteProduct.html', details=deleteProduct)
+        return render_template('deleteProduct.html', brand_id=brand_id,
+                               product_id=product_id, details=deleteProduct)
     # return "This page is for deleting product details %s" % product_id
 
 
