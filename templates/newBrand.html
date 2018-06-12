@@ -4,7 +4,7 @@
 </head>
 <body>
 <h1>New Brand</h1>
-<form action="#" method = 'post'>
+<form action="{{url_for('newBrand', brand_id=brand_id)}}" method = 'post'>
 	<p>Name:</p>
 		<input type ='text' size='30' name='name'>
 <input type='submit' value='Create'>
