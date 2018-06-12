@@ -4,7 +4,7 @@
 </head>
 <body>
 <h1> Are you sure you want to delete {{details.name}}? </h1>
-<form action="#" method = 'post'>
+<form action="{{ url_for('deleteProduct', brand_id=brand_id, product_id=product_id) }}" method = 'post'>
 <input type='submit', value = 'Delete'>
 </form>
 <a href = '#'> Cancel </a>
