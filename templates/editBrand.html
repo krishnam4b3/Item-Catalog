@@ -4,11 +4,11 @@
 </head>
 <body>
 <h1> Edit Brand </h1>
-<form action="{{ url_for('editBrand',brand_id = brand.id)}}" method = 'post'>
+<form action="{{url_for('editBrand', brand_id=brand_id)}}" method = 'post'>
 	<p>Name:</p>
 		<input type ='text' size='30' name='name' placeholder = '{{brand.name }}'>
 <input type='submit' value='Edit'>
-<a href = '{{url_for('showBrands')}}'> Cancel </a>
+<a href = '#'> Cancel </a>
 </form>
 </body>
 </html>
