@@ -43,6 +43,8 @@ class Product(Base):
     costumetype = Column(String(250))
     brand_id = Column(Integer, ForeignKey('brand.id'))
     brand = relationship(Brand)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
