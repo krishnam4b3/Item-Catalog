@@ -3,7 +3,7 @@
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body><h1> Edit Product </h1>
-<form action="#" method = 'post'>
+<form action="{{ url_for('editProduct', brand_id=brand_id, product_id=product_id) }}" method = 'post'>
 	<p>Name:</p>
 		<input type ='text' size='30' name='name' placeholder = '{{details.name }}'>
 	<p>Description:</p>
